@@ -1,0 +1,5 @@
+export const progressKey=w=>`ruang-belajar:v1:${w.id}:${w.version}`;
+export function evaluate(q,value){const normalize=v=>String(v??'').trim().toLocaleLowerCase('id').replace(/\s+/g,' ');return q.answers.some(a=>normalize(a)===normalize(value));}
+export function status(w,p){const answers=p.answers??{};const count=w.questions.filter((_,i)=>String(answers[i]??'').trim()).length;const score=p.checked?w.questions.filter((q,i)=>evaluate(q,answers[i])).length:0;return {count,score,state:p.checked&&count===w.questions.length?'done':count?'active':'new'};}
+export function loadProgress(storage,w){try{const p=JSON.parse(storage.getItem(progressKey(w)));if(!p||typeof p.answers!=='object'||p.answers===null||Array.isArray(p.answers))throw Error();return {answers:Object.fromEntries(Object.entries(p.answers).filter(([k,v])=>/^\d+$/.test(k)&&Number(k)<w.questions.length&&typeof v==='string')),checked:p.checked===true};}catch{return {answers:{},checked:false};}}
+export function saveProgress(storage,w,p){try{storage.setItem(progressKey(w),JSON.stringify(p));return true;}catch{return false;}}
